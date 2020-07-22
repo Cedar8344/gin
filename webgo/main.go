@@ -69,7 +69,8 @@ func runServer(args arguments) error {
 			if err != nil {
 				panic(err.Error())
 			}
-			content = "{" + strconv.Quote("message") + ":" + strconv.Quote(tag.Id) + strconv.Quote(tag.Username) + strconv.Quote(tag.Password) + strconv.Quote(tag.Firstname) + strconv.Quote(tag.Lastname)+ "}"
+			content = "{" + strconv.Quote("message") + ":" + strconv.Quote(strconv.Itoa(tag.Id) + tag.Username + tag.Password + tag.Firstname + tag.Lastname) + "}"
+			//content = "{" + strconv.Quote("message") + ":" + strconv.Quote(tag.Id) + strconv.Quote(tag.Username) + strconv.Quote(tag.Password) + strconv.Quote(tag.Firstname) + strconv.Quote(tag.Lastname)+ "}"
 		}
 		c.String(200, content)
 	})
