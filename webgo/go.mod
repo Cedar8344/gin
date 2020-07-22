@@ -8,6 +8,7 @@ require (
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/gin-contrib/static v0.0.0-20191128031702-f81c604d8ac2
 	github.com/gin-gonic/gin v1.6.3
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/imdario/mergo v0.3.10 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/pelletier/go-toml v1.8.0 // indirect
