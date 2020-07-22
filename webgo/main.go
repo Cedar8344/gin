@@ -29,7 +29,11 @@ type arguments struct {
 }
 
 type Tag struct {
-	Username string `json:"username"`
+        Id int `json:"id"`
+        Username string `json:"username"`
+        Password string `json:"password"`
+        Firstname string `json:"firstname"`
+        Lastname string `json:"lastname"`
 }
 
 func runServer(args arguments) error {
@@ -54,18 +58,18 @@ func runServer(args arguments) error {
 			panic(err.Error())
 		}
 		defer db.Close()
-		results, err := db.Query("SELECT Username FROM user")
+		results, err := db.Query("SELECT * FROM user")
 		if err != nil {
 			fmt.Println("error in part 2")
                 }
 		var tag Tag
 		var content string
 		for results.Next() {
-			err = results.Scan(&tag.Username)
+			err = results.Scan(&tag.Id, &tag.Username, &tag.Password, &tag.Firstname, &tag.Lastname)
 			if err != nil {
 				panic(err.Error())
 			}
-			content = "{" + strconv.Quote("message") + ":" + strconv.Quote(tag.Username) + "}"
+			content = "{" + strconv.Quote("message") + ":" + strconv.Quote(tag.Id) + strconv.Quote(tag.Username) + strconv.Quote(tag.Password) + strconv.Quote(tag.Firstname) + strconv.Quote(tag.Lastname)+ "}"
 		}
 		c.String(200, content)
 	})
