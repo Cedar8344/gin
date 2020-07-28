@@ -1,0 +1,83 @@
+<template>
+  <div>
+    <div>MyApp</div>
+    <button v-on:click="showMessage">I want help</button>
+    <div>{{message}}</div>
+    <button v-on:click="addPoint">I want die</button>
+    <div>{{message2}}</div>
+    <form id="app" @submit="checkForm" action="/something" method="post">
+      <!--<p v-if="errors.length">
+        <b>Please correct the following error(s):</b>
+        <ul>
+          <li v-for="error in errors" :key="error">{{ error }}</li>
+        </ul> 
+      </p>-->
+      <p>
+        <label for="name">Name</label>
+        <input type="text" name="name" id="name" v-model="name">
+      </p>
+
+      <p>
+        <label for="age">Age</label>
+        <input type="number" name="age" id="age" v-model="age" min="0">
+      </p>
+
+      <p>
+        <label for="movie">Favorite Movie</label>
+        <select name="movie" id="movie" v-model="movie">
+          <option>Star Wars</option>
+          <option>Vanilla Sky</option>
+          <option>Atomic Blonde</option>
+        </select>
+      </p>
+    </form>
+  </div>
+</template>
+<script>
+import axios from "axios";
+const appData = {
+  message: "",
+  message2: ""
+};
+export default {
+  data() {
+    return appData;
+  },
+  methods: {
+    showMessage: showMessage,
+    addPoint: addPoint
+  }
+};
+function showMessage() {
+  axios.get("/api/v1/hello").then(res => {
+    console.log(res);
+    appData.message = res.data.message;
+  });
+}
+function addPoint(){
+  axios.get("/api/v1/add").then(res => {
+  console.log(res); 
+  appData.message2 = res.data.message;
+});
+}
+/*const app = new Vue({
+  el:'#app',
+  data:{
+    errors:[],
+    name:null,
+    age:null,
+    movie:null
+  },
+  methods:{
+    checkForm:function(e) {
+      if(this.name && this.age) return true;
+      this.errors = [];
+      if(!this.name) this.errors.push("Name required.");
+      if(!this.age) this.errors.push("Age required.");
+      e.preventDefault();
+    }
+  }
+})*/
+</script>
+<style>
+</style>
