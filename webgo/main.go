@@ -28,22 +28,17 @@ type arguments struct {
 	StaticContents string
 }
 
+type Temp struct{
+	Id        string    `json:"id"`
+}
+
 type Tag struct {
-	Id        int    `json:"id"`
+	Id        string   `json:"id"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`
 	Firstname string `json:"firstname"`
 	Lastname  string `json:"lastname"`
 }
-
-type Tag2 struct {
-        Id        string    `json:"id"`
-        Username  string `json:"username"`
-        Password  string `json:"password"`
-        Firstname string `json:"firstname"`
-        Lastname  string `json:"lastname"`
-}
-
 
 func runServer(args arguments) error {
 	level, ok := logLevelMap[args.LogLevel]
@@ -79,7 +74,7 @@ func runServer(args arguments) error {
 			if err != nil {
 				panic(err.Error())
 			}
-			temp = temp + strconv.Itoa(tag.Id)+tag.Username+tag.Password+tag.Firstname+tag.Lastname
+			temp = temp + tag.Id+tag.Username+tag.Password+tag.Firstname+tag.Lastname
                 }
                 content = "{" + strconv.Quote("message") + ":" + strconv.Quote(temp) + "}"
 		c.String(200, content)
@@ -95,17 +90,44 @@ func runServer(args arguments) error {
 		c.String(200, "{"+strconv.Quote("message")+":"+strconv.Quote("sent")+"}")
 	})
         r.POST("api/v1/post", func(c *gin.Context){
-                var tag Tag2
+                var tag Tag
                 var content string
-		c.Bind(&tag)
-                fmt.Println(tag.Id)
-                content = "insert into user values(" + tag.Id + "," +strconv.Quote(tag.Username) + "," +strconv.Quote(tag.Password) + "," +strconv.Quote(tag.Firstname) + "," +strconv.Quote(tag.Lastname)+")"
+                c.Bind(&tag)
+                fmt.Println(tag)
+                content = "insert into user values(" + strconv.Quote(tag.Id) + "," +strconv.Quote(tag.Username) + "," +strconv.Quote(tag.Password) + "," +strconv.Quote(tag.Firstname) + "," +strconv.Quote(tag.Lastname)+")"
                 fmt.Println(content)
                 insert, err := db.Query(content)
 		if err != nil {
 			panic(err.Error())
 		}
-		defer insert.Close()
+                defer insert.Close()
+                c.String(200, "{"+strconv.Quote("message")+":"+strconv.Quote("sent")+"}")
+        })
+        r.PUT("api/v1/put", func(c *gin.Context){
+                var tag Tag
+                c.Bind(&tag)
+                usern := tag.Username
+                passw := tag.Password
+                firstn := tag.Firstname
+                lastn := tag.Lastname
+                id, _ := strconv.Atoi(tag.Id)
+                insForm, err := db.Prepare("update user set Username=?, Password=?, Firstname=?, Lastname=? WHERE id=?")
+                if err != nil{
+                        panic(err.Error())
+                }
+                insForm.Exec(usern, passw, firstn, lastn, id)
+                c.String(200, "{"+strconv.Quote("message")+":"+strconv.Quote("sent")+"}")
+        })
+        r.DELETE("api/v1/delete", func(c *gin.Context){
+                var temp Temp
+                c.Bind(&temp)
+                fmt.Println(temp)
+                delForm, err := db.Prepare("DELETE FROM user WHERE Id=?")
+                if err != nil{
+                        panic(err.Error())
+                }
+                delForm.Exec(temp.Id)
+                c.String(200, "{"+strconv.Quote("message")+":"+strconv.Quote("sent")+"}")
         })
         if err := r.Run(fmt.Sprintf("%s:%d", args.BindAddress, args.BindPort)); err != nil {
 		return err
