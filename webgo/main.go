@@ -55,12 +55,14 @@ func runServer(args arguments) error {
 	r := gin.Default()
 
         r.Use(static.Serve("/", static.LocalFile(args.StaticContents, false)))
+
         db, err := sql.Open("mysql", "cedar:Degc2019@tcp(192.168.122.150:3306)/test")
 	if err != nil {
 		fmt.Println("you broke it")
 		panic(err.Error())
 	}
-		defer db.Close()
+        defer db.Close()
+        
 	r.GET("/api/v1/hello", func(c *gin.Context) {
 		results, err := db.Query("SELECT * FROM user")
 		if err != nil {
@@ -80,8 +82,6 @@ func runServer(args arguments) error {
 		c.String(200, content)
 	})
 	r.GET("/api/v1/add", func(c *gin.Context) {
-		fmt.Println("hello")
-		//insert, err := db.Query("insert into test values (1, 'Deathoath', '123456', 'Nami', 'Rakan')")
 		insert, err := db.Query("insert into user values (1, 'Deathoath', '123456', 'Nami', 'Rakan')")
 		if err != nil {
 			panic(err.Error())
@@ -142,7 +142,6 @@ func main() {
 		BindPort:       9080,
 		StaticContents: "./static",
 	}
-
 	if err := runServer(args); err != nil {
 		logger.WithError(err).Fatal("Server exits with error")
 	}
